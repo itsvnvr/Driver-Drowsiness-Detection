@@ -1,103 +1,148 @@
-# Drowsiness Detection
+# 🚗 Real-Time Driver Drowsiness Detection
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Architecture & How It Works](#architecture--how-it-works)
-- [Usage Instructions](#usage-instructions)
-  - [Setup and Running the Server](#setup-and-running-the-server)
-- [Model Information](#model-information)
-- [Directory Structure](#directory-structure)
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-GPU-EE4C2C?logo=pytorch&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-5C3EE8?logo=opencv&logoColor=white)
+![C#](https://img.shields.io/badge/Client-C%23%20WinForms-239120?logo=c-sharp&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## Introduction
-This project aims to **detect driver drowsiness** in real-time.
+> A robust AI-powered system designed to prevent accidents by detecting driver fatigue in real-time using deep learning.
 
-The application uses a deep learning model to analyze video from a webcam, classifying the driver's state based on eye and mouth features. The model can identify three main states: **Eyes open**, **Eyes closed**, and **Yawning**.
+<div align="center"> 
+  <img src="img/Microsleep_image.png" alt="Eyes Closed Detection" width="45%" style="border-radius: 10px; margin-right: 10px;">
+  <img src="img/OpenEye_image.png" alt="Yawning Detection" width="45%" style="border-radius: 10px;">
+</div>
 
-## Architecture & How It Works
-The project is built on a **Client-Server** model:
+## 📋 Table of Contents
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Tech Stack](#-tech-stack)
+- [Installation & Setup](#-installation--setup)
+- [Usage](#-usage)
+- [Model & Data](#-model--data)
+- [Directory Structure](#-directory-structure)
 
-* **Server (`server.py`):**
-    * Runs the server at `127.0.0.1:9001`.
-    * Executes the AI model (CNN) to process each frame, detect faces, and classify states (open, closed, yawning).
-    * Sends processed video and JSON data (blink count, yawn count, eye closure duration, drowsiness status, etc.) to the Client.
+## 📖 Overview
+This project implements a **Client-Server application** to monitor driver alertness. It utilizes a Convolutional Neural Network (CNN) to analyze webcam feeds frame-by-frame, classifying facial cues such as eye closure and yawning to trigger alerts when signs of drowsiness are detected.
 
-* **Client (`DrowsinessClient.exe`):**
-    * A Windows Forms (C#) interface displaying live video and metrics from the Server.
-    * When the user clicks "Connect", the Client connects to the Server (`127.0.0.1:9001`).
-    * Continuously updates metrics: blink count, yawn duration, microsleep, processing time.
+## ✨ Key Features
+* **Real-time Detection:** Low-latency processing using PyTorch (GPU accelerated).
+* **Multi-State Classification:** Accurately identifies **Eyes Open**, **Eyes Closed**, and **Yawning**.
+* **Hybrid Architecture:**  
+  * **Backend:** Python AI processing engine.  
+  * **Frontend:** C# Windows Forms for a user-friendly dashboard.
+* **Advanced Metrics:** Tracks blink counts, yawn duration, and microsleep instances.
+* **Audio Alerts:** Plays alarm sounds when dangerous fatigue levels are reached.
 
-## Usage Instructions
+## 🏗 System Architecture
 
-To run the application, follow two steps: Set up the environment and run the Server.
+The system operates on a TCP/IP Client-Server model:
 
-### Setup and Running the Server
+### 1. The Server (`server.py`)
+* **Role:** The "Brain" of the system.
+* **Function:** Captures video, detects faces using MediaPipe, and passes ROIs (Regions of Interest) to the CNN model.
+* **Output:** Streams processed video frames and JSON metadata (drowsiness status, metrics) to the client via `127.0.0.1:9001`.
 
-The project is deployed in an **Anaconda** environment (Anaconda Prompt) with Python 3.10, using **PyTorch GPU** to accelerate training and model execution.
+### 2. The Client (`DrowsinessClient.exe`)
+* **Role:** The User Interface.
+* **Function:** Connects to the server, renders the video stream, and visualizes health metrics.
+* **Platform:** Built with C# (Windows Forms).
 
-**1. Create an Anaconda Environment (Recommended):**
+## 🛠 Tech Stack
+* **Core Language:** Python 3.10  
+* **Deep Learning:** PyTorch (CUDA 12.1 support recommended)  
+* **Computer Vision:** OpenCV, MediaPipe  
+* **GUI Client:** C# .NET Framework  
+* **Environment:** Anaconda  
+
+## ⚙️ Installation & Setup
+
+### Prerequisites
+* **NVIDIA GPU** (Recommended for real-time performance) with CUDA drivers installed.  
+* **Anaconda** or Miniconda.  
+* **Webcam**.
+
+### Step 1: Environment Setup (Anaconda)
+It is highly recommended to use Conda to manage dependencies and CUDA versions.
+
 ```bash
-# Create a new environment named 'drowsy' with Python 3.10
+# 1. Create a new environment
 conda create -n drowsy python=3.10
 
-# Activate the environment
+# 2. Activate the environment
 conda activate drowsy
 ```
 
-**2. Install Dependencies:**
+### Step 2: Install PyTorch (GPU)
 
-Install the **PyTorch GPU** version compatible with **CUDA 12.1**, along with required libraries:
+Install the version compatible with your CUDA drivers (e.g., CUDA 12.1):
 
 ```bash
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 ```
+
 > **Note:** If your machine does not have NVIDIA drivers or CUDA Toolkit installed, install them before running PyTorch GPU.
 
+### Step 3: Install Python Dependencies
+
 ```bash
-# Mediapipe
-pip install mediapipe
-
-# OpenCV
-pip install opencv-python
-
-# Pygame
-pip install pygame
+pip install mediapipe opencv-python pygame
 ```
 
-If not using an **Anaconda** environment (Anaconda Prompt), create a virtual environment and run the following in the terminal:
+*Alternatively, if not using Conda:*
+
 ```bash
 pip install -r requirements.txt
 ```
 
-**3. Start the Server:**
+## 🚀 Usage
 
-After setup, run the `run.py` file. If successful, you will see the following message in the terminal:
+### 1. Start the AI Server
+
+Navigate to the project directory and run the execution script:
+
+```bash
+python run.py
 ```
+
+Expected output:
+
+```text
 [OK] Camera opened
 Server running at 127.0.0.1:9001
 ```
-In the Client application, click the "CONNECT TO" button. Once connected successfully, the Client will receive and display the processed video from the Server, along with detailed metrics and drowsiness alerts.
 
-<div align="center"> <img src="img/image.png" alt="Demo image eyes closed" width="48%">
+### 2. Connect the Client
 
-<img src="img/image_1.png" alt="Demo image yawning" width="48%"> </div>
+1. Open **`DrowsinessClient.exe`** (located in `DrowsinessClient/bin/Debug/` or root).  
+2. Click **CONNECT TO**.  
+3. The application will start streaming video and displaying fatigue metrics.
 
-## Model Information
-* **Model:** CNN-cls.
-* **Task:** Eye & Yawn Classification → Drowsiness Detection.
-* **Training Data:**
-    * [YawDD Dataset](https://ieee-dataport.org/open-access/yawdd-yawning-detection-dataset) (For yawn detection).
-    * [MRL Eye Dataset](https://www.kaggle.com/datasets/imadeddinedjerarda/mrl-eye-dataset) (For eye open/closed detection).
+## 🧠 Model & Data
 
-## Directory Structure
-```
+**Architecture:** Custom CNN-cls (Convolutional Neural Network for Classification).  
+**Tasks:** Binary classification for Eyes (Open/Closed) and Yawning.
+
+### Datasets Used
+
+1. **Yawning:** YawDD Dataset — specialized video dataset for yawning detection.  
+2. **Eyes:** MRL Eye Dataset — large-scale dataset of human eye images.
+
+## 📂 Directory Structure
+
+```text
 .
-├── alarm/                  # (Folder containing alert sounds)
-├── DrowsinessClient/       # (Client source code)
-├── runs/                   # (CNN training results/logs)
-├── .gitignore
-├── hybrid_drowsiness_detector.py # (Core AI/model logic)
-├── README.md               # (You are reading this file)
-├── requirements.txt        # (Python libraries)
-├── run.py                  # (Executable file)
-└── server.py               # (Server backend file)
+├── alarm/                        # Audio files for alert sounds
+├── DrowsinessClient/             # C# Client Source Code (Visual Studio Project)
+├── runs/                         # Checkpoints & Training logs
+├── hybrid_drowsiness_detector.py # Core AI Logic (Model inference class)
+├── server.py                     # Socket Server & Video Processing Pipeline
+├── run.py                        # Main Entry Point
+├── requirements.txt              # Python Dependencies
+└── README.md                     # Project Documentation
 ```
+
+---
+
+**Note:** Ensure your webcam is not being used by another application before starting the server.
